@@ -1,0 +1,14 @@
+.agent/
+
+# Artefactos de compilacion de OpenModelica
+*.bat
+*.c
+*.exe
+*.h
+*.libs
+*.makefile
+*.o
+*_info.json
+*_init.xml
+*_Jac*.bin
+*_res.csv
