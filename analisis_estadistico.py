@@ -291,7 +291,7 @@ def guardar(
     corridas: list[dict[str, float | int | str]],
     resumen: list[dict[str, float | int | str]],
     args: argparse.Namespace,
-) -> None:
+) -> Path:
     configuracion = {
         "replicasConfiguradas": args.replicas,
         "pedidosPorHoraConfigurados": args.pedidos_por_hora,
@@ -304,12 +304,15 @@ def guardar(
         "porcentajePapasConfigurado": args.porcentaje_papas,
         "factorCongestionConfigurado": args.factor_congestion,
     }
-    filas = [{**configuracion, **fila} for fila in corridas + resumen]
-    campos = list(configuracion) + [
+    campos_corridas = list(configuracion) + [
         "tipo",
         "cocineros",
         "replica",
         *METRICAS,
+    ]
+    campos_resumen = list(configuracion) + [
+        "tipo",
+        "cocineros",
         "mediaTiempoPromedio",
         "desvioTiempoPromedio",
         "ic95InferiorTiempoPromedio",
@@ -322,11 +325,38 @@ def guardar(
         "ic95SuperiorMejora",
         "significativa",
     ]
+
+    def valor_excel(valor: float | int | str | None) -> str:
+        if valor is None or valor == "":
+            return ""
+        if isinstance(valor, str):
+            return valor
+        numero = float(valor)
+        if numero.is_integer():
+            return str(int(numero))
+        return f"{numero:.4f}".rstrip("0").rstrip(".").replace(".", ",")
+
+    def escribir(ruta_destino: Path, campos: list[str], filas: list[dict]) -> None:
+        with ruta_destino.open("w", newline="", encoding="utf-8-sig") as archivo:
+            escritor = csv.DictWriter(
+                archivo,
+                fieldnames=campos,
+                delimiter=";",
+                extrasaction="ignore",
+                lineterminator="\n",
+            )
+            escritor.writeheader()
+            for fila in filas:
+                completa = {**configuracion, **fila}
+                escritor.writerow(
+                    {campo: valor_excel(completa.get(campo, "")) for campo in campos}
+                )
+
     ruta.parent.mkdir(parents=True, exist_ok=True)
-    with ruta.open("w", newline="", encoding="utf-8") as archivo:
-        escritor = csv.DictWriter(archivo, fieldnames=campos, extrasaction="ignore")
-        escritor.writeheader()
-        escritor.writerows(filas)
+    ruta_corridas = ruta.with_name(f"{ruta.stem}_corridas{ruta.suffix}")
+    escribir(ruta_corridas, campos_corridas, corridas)
+    escribir(ruta, campos_resumen, resumen)
+    return ruta_corridas
 
 
 def imprimir_resumen(resumen: list[dict[str, float | int | str]]) -> None:
@@ -368,9 +398,10 @@ def main() -> None:
     salida = args.salida
     if not salida.is_absolute():
         salida = proyecto / salida
-    guardar(salida, corridas, resumen, args)
+    salida_corridas = guardar(salida, corridas, resumen, args)
     imprimir_resumen(resumen)
-    print(f"\nResultados: {salida}")
+    print(f"\nResumen: {salida}")
+    print(f"Corridas: {salida_corridas}")
 
 
 if __name__ == "__main__":
