@@ -1,4 +1,4 @@
-"""Ejecuta replicas pareadas y compara escenarios de cocineros."""
+﻿"""Ejecuta replicas pareadas y compara escenarios de cocineros."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def argumentos() -> argparse.Namespace:
     parser.add_argument("--cocineros", type=int, nargs="+", default=[1, 2, 3])
     parser.add_argument("--pedidos-por-hora", type=float, default=12.0)
     parser.add_argument("--duracion-pico", type=float, default=120.0)
-    parser.add_argument("--horizonte", type=float, default=480.0)
+    parser.add_argument("--horizonte", type=float, default=210.0)
     parser.add_argument("--personas-armado", type=int, default=2)
     parser.add_argument("--hamburguesas-min", type=int, default=1)
     parser.add_argument("--hamburguesas-max", type=int, default=4)
@@ -406,3 +406,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

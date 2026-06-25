@@ -1,4 +1,4 @@
-﻿Column1;pedidosPorHoraConfigurados;duracionPicoMin;horizonteMin;personasArmadoConfiguradas;hamburguesasMinConfiguradas;hamburguesasMaxConfiguradas;porcentajeEspecialesConfigurado;porcentajePapasConfigurado;factorCongestionConfigurado;tipo;cocineros;mediaTiempoPromedio;desvioTiempoPromedio;ic95InferiorTiempoPromedio;ic95SuperiorTiempoPromedio;mediaTiempoMaximo;mediaColaArmadoMaxima;mejoraMediaVsUno;mejoraPorcentualVsUno;ic95InferiorMejora;ic95SuperiorMejora;significativa
-30;12;120;480;2;1;4;35%;75%;1;resumen;1;19,1487;2,0797;18,4381;19,9042;29,5143;3,1333;0;0%;0,00;0,00;base
-30;12;120;480;2;1;4;35%;75%;1;resumen;2;18,5395;2,0847;17,831;19,3034;28,4176;3,1333;0,6092;318%;0,54;0,67;si_mejora
-30;12;120;480;2;1;4;35%;75%;1;resumen;3;18,304;2,0667;17,6256;19,0637;28,0786;3,1333;0,8447;441%;0,77;0,93;si_mejora
+﻿replicasConfiguradas;pedidosPorHoraConfigurados;duracionPicoMin;horizonteMin;personasArmadoConfiguradas;hamburguesasMinConfiguradas;hamburguesasMaxConfiguradas;porcentajeEspecialesConfigurado;porcentajePapasConfigurado;factorCongestionConfigurado;tipo;cocineros;mediaTiempoPromedio;desvioTiempoPromedio;ic95InferiorTiempoPromedio;ic95SuperiorTiempoPromedio;mediaTiempoMaximo;mediaColaArmadoMaxima;mejoraMediaVsUno;mejoraPorcentualVsUno;ic95InferiorMejora;ic95SuperiorMejora;significativa
+30;12;120;210;2;1;4;0,35;0,75;1;resumen;1;18,6786;1,5223;18,1513;19,2184;27,8966;2,7;0;0;0;0;base
+30;12;120;210;2;1;4;0,35;0,75;1;resumen;2;18,0013;1,4671;17,4939;18,5433;26,8909;2,7667;0,6774;3,6264;0,6254;0,732;si_mejora
+30;12;120;210;2;1;4;0,35;0,75;1;resumen;3;17,7824;1,432;17,2966;18,2973;26,5223;2,7667;0,8962;4,7982;0,8292;0,9663;si_mejora

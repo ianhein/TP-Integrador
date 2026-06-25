@@ -1,10 +1,6 @@
-model Simulacion
+﻿model Simulacion
   constant Integer maxHamburguesasModelo = 12
     "Limite interno para permitir editar hamburguesasMax";
-  constant Real segundosPorMinuto = 60
-    "Conversion de minutos a segundos SI";
-  constant Real segundosPorHora = 3600
-    "Conversion de horas a segundos SI";
 
   //                              PARAMETROS
   // Generadores aleatorios
@@ -13,13 +9,13 @@ model Simulacion
     "Semilla para llegadas y composicion";
   parameter Integer localSeedServicio = 124642
     "Semilla para tiempos de servicio";
-  parameter Integer replica(min = 0) = 0
-    "Identificador de replica para comparaciones reproducibles";
+  parameter Integer replica = 0
+    "Indice de replica para variar las semillas";
 
   // Tiempo y demanda
   parameter Real duracionPico = 120 "Horario pico en minutos";
-  parameter Real duracionSimulacion = 480
-    "Horizonte total para terminar pedidos";
+  parameter Real duracionSimulacion = 210
+    "Horizonte total del turno noche modelado";
   parameter Real pedidosPorHora(min = 0.01) = 12
     "Demanda supuesta para horario pico";
   parameter Integer maxPedidos(min = 1) = 100
@@ -215,7 +211,6 @@ model Simulacion
   Real errorCalibracionTiempo
     "Diferencia respecto del dato usado para calibrar";
   Real errorCalibracionPorcentual;
-  Real tiempoSimuladoMin "Tiempo de simulacion expresado en minutos";
   Integer pedidosEnProceso;
   Integer balancePedidos;
   Integer balanceHamburguesas;
@@ -310,10 +305,10 @@ initial algorithm
 
   estadoDemanda :=
     Modelica.Math.Random.Generators.Xorshift1024star.initialState(
-      localSeed + replica, globalSeed);
+      localSeed + 1009 * replica, globalSeed);
   estadoServicio :=
     Modelica.Math.Random.Generators.Xorshift1024star.initialState(
-      localSeedServicio + replica, globalSeed);
+      localSeedServicio + 2003 * replica, globalSeed);
   (aleatorioDemanda, estadoDemanda) :=
     Modelica.Math.Random.Generators.Xorshift1024star.random(
       estadoDemanda);
@@ -321,12 +316,11 @@ initial algorithm
     Modelica.Math.Random.Generators.Xorshift1024star.random(
       estadoServicio);
   proximaLlegada :=
-    -log(max(aleatorioDemanda, 1e-12)) *
-      segundosPorHora / pedidosPorHora;
+    -log(max(aleatorioDemanda, 1e-12)) * 60 / pedidosPorHora;
 
 algorithm
   when (time >= pre(proximaLlegada) and
-        pre(proximaLlegada) <= duracionPico * segundosPorMinuto) or
+        pre(proximaLlegada) <= duracionPico) or
        min(pre(finCoccion)) <= time or
        min(pre(finArmado)) <= time then
 
@@ -385,13 +379,12 @@ algorithm
       if a <= personasArmado and
          pre(armadoActivo[a]) and
          time >= pre(finArmado[a]) then
-        tiempoTotalT :=
-          (time - pre(armadoLlegada[a])) / segundosPorMinuto;
+        tiempoTotalT := time - pre(armadoLlegada[a]);
         terminadosT := terminadosT + 1;
         sumaTiemposT := sumaTiemposT + tiempoTotalT;
         ultimoTiempoT := tiempoTotalT;
         maxTiempoT := max(maxTiempoT, tiempoTotalT);
-        finUltimoT := time / segundosPorMinuto;
+        finUltimoT := time;
         mas20T := mas20T + (if tiempoTotalT > 20 then 1 else 0);
         mas35T := mas35T + (if tiempoTotalT > 35 then 1 else 0);
         mas120T := mas120T + (if tiempoTotalT > 120 then 1 else 0);
@@ -401,7 +394,7 @@ algorithm
 
         if pre(armadoId[a]) == pedidoObjetivo then
           pedidoObjetivoTerminado := true;
-          finPedidoObjetivo := time / segundosPorMinuto;
+          finPedidoObjetivo := time;
           armadoPedidoObjetivo := pre(armadoDuracion[a]);
           tiempoTotalPedidoObjetivo := tiempoTotalT;
         end if;
@@ -431,7 +424,7 @@ algorithm
         cFin[s] := 1e60;
 
         if pre(coccionId[s]) == pedidoObjetivo then
-          finCoccionPedidoObjetivo := time / segundosPorMinuto;
+          finCoccionPedidoObjetivo := time;
           coccionPedidoObjetivo := pre(coccionDuracion[s]);
         end if;
       end if;
@@ -439,7 +432,7 @@ algorithm
 
     // Nueva llegada
     if time >= pre(proximaLlegada) and
-       pre(proximaLlegada) <= duracionPico * segundosPorMinuto then
+       pre(proximaLlegada) <= duracionPico then
       assert(qCoccionN < maxPedidos,
         "La cola de coccion supero maxPedidos");
 
@@ -485,15 +478,14 @@ algorithm
         pre(porcionesPapasTotales) + papasT;
 
       if pre(cantidadPedidos) + 1 == pedidoObjetivo then
-        llegadaPedidoObjetivo := time / segundosPorMinuto;
+        llegadaPedidoObjetivo := time;
       end if;
 
       (aleatorioT, estadoDemandaT) :=
         Modelica.Math.Random.Generators.Xorshift1024star.random(
           estadoDemandaT);
       intervaloT :=
-        -log(max(aleatorioT, 1e-12)) *
-          segundosPorHora / pedidosPorHora;
+        -log(max(aleatorioT, 1e-12)) * 60 / pedidosPorHora;
       proximaLlegada := time + intervaloT;
     end if;
 
@@ -507,15 +499,13 @@ algorithm
         aDuracionC[a] := qADuracionC[1];
         aInicio[a] := time;
         aDuracion[a] := qADuracion[1];
-        aFin[a] := time + qADuracion[1] * segundosPorMinuto;
+        aFin[a] := time + qADuracion[1];
         armandoN := armandoN + 1;
 
         if qAid[1] == pedidoObjetivo then
-          inicioArmadoPedidoObjetivo := time / segundosPorMinuto;
+          inicioArmadoPedidoObjetivo := time;
           esperaArmadoPedidoObjetivo :=
-            (time - (qAInicioC[1] +
-              qADuracionC[1] * segundosPorMinuto)) /
-            segundosPorMinuto;
+            time - (qAInicioC[1] + qADuracionC[1]);
         end if;
 
         for i in 1:maxPedidos - 1 loop
@@ -633,7 +623,7 @@ algorithm
         tiempoArmadoUltimoPedido := tArmadoT;
 
         cActiva[slotLibre] := true;
-        cFin[slotLibre] := time + tCoccionT * segundosPorMinuto;
+        cFin[slotLibre] := time + tCoccionT;
         cId[slotLibre] := qCid[1];
         cH[slotLibre] := cantidadT;
         cE[slotLibre] := especialesT;
@@ -648,9 +638,8 @@ algorithm
 
         if qCid[1] == pedidoObjetivo then
           pedidoObjetivoIniciado := true;
-          inicioCoccionPedidoObjetivo := time / segundosPorMinuto;
-          esperaCoccionPedidoObjetivo :=
-            (time - qCl[1]) / segundosPorMinuto;
+          inicioCoccionPedidoObjetivo := time;
+          esperaCoccionPedidoObjetivo := time - qCl[1];
         end if;
 
         for i in 1:maxPedidos - 1 loop
@@ -723,7 +712,6 @@ algorithm
 
   //                              ECUACIONES
 equation
-  tiempoSimuladoMin = time / segundosPorMinuto;
   factorAtencionCoccion = 1.0 / cocinerosPlancha;
   pedidosEnProceso =
     longitudColaCoccion + pedidosEnCoccion +
@@ -782,13 +770,11 @@ equation
     else 0;
 
   der(cargaPlanchaAcumulada) =
-    hamburguesasEnCoccion /
-      capacidadHamburguesasTanda / segundosPorMinuto;
+    hamburguesasEnCoccion / capacidadHamburguesasTanda;
   der(cargaFreidoraAcumulada) =
-    papasEnCoccion /
-      capacidadPapasTanda / segundosPorMinuto;
+    papasEnCoccion / capacidadPapasTanda;
   der(cargaArmadoAcumulada) =
-    personasArmando / personasArmado / segundosPorMinuto;
+    personasArmando / personasArmado;
 
   utilizacionPlancha =
     if tiempoFinalUltimoPedido > 0 then
@@ -806,7 +792,11 @@ equation
   annotation(
     experiment(
       StartTime = 0,
-      StopTime = 28800,
+      StopTime = 210,
       Tolerance = 1e-06,
-      Interval = 6));
+      Interval = 0.1));
 end Simulacion;
+
+
+
+
