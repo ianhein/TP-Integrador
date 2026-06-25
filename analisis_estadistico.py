@@ -1,4 +1,4 @@
-﻿"""Ejecuta replicas pareadas y compara escenarios de cocineros."""
+"""Ejecuta replicas pareadas y compara escenarios de cocineros."""
 
 from __future__ import annotations
 
@@ -44,6 +44,7 @@ def argumentos() -> argparse.Namespace:
     parser.add_argument("--duracion-pico", type=float, default=120.0)
     parser.add_argument("--horizonte", type=float, default=210.0)
     parser.add_argument("--personas-armado", type=int, default=2)
+    parser.add_argument("--planchas", type=int, default=2)
     parser.add_argument("--hamburguesas-min", type=int, default=1)
     parser.add_argument("--hamburguesas-max", type=int, default=4)
     parser.add_argument("--porcentaje-especiales", type=float, default=0.35)
@@ -70,6 +71,8 @@ def argumentos() -> argparse.Namespace:
         parser.error("--horizonte debe ser mayor o igual a --duracion-pico")
     if args.hamburguesas_min > args.hamburguesas_max:
         parser.error("El minimo de hamburguesas supera al maximo")
+    if args.planchas < 1:
+        parser.error("--planchas debe ser al menos 1")
     return args
 
 
@@ -132,6 +135,7 @@ def crear_override(args: argparse.Namespace, replica: int, cocineros: int) -> st
         "replica": replica,
         "cocinerosPlancha": cocineros,
         "personasArmado": args.personas_armado,
+        "cantidadPlanchas": args.planchas,
         "pedidosPorHora": args.pedidos_por_hora,
         "duracionPico": args.duracion_pico,
         "duracionSimulacion": args.horizonte,
@@ -298,6 +302,7 @@ def guardar(
         "duracionPicoMin": args.duracion_pico,
         "horizonteMin": args.horizonte,
         "personasArmadoConfiguradas": args.personas_armado,
+        "planchasConfiguradas": args.planchas,
         "hamburguesasMinConfiguradas": args.hamburguesas_min,
         "hamburguesasMaxConfiguradas": args.hamburguesas_max,
         "porcentajeEspecialesConfigurado": args.porcentaje_especiales,

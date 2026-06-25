@@ -1,0 +1,4 @@
+﻿replicasConfiguradas;pedidosPorHoraConfigurados;duracionPicoMin;horizonteMin;personasArmadoConfiguradas;planchasConfiguradas;hamburguesasMinConfiguradas;hamburguesasMaxConfiguradas;porcentajeEspecialesConfigurado;porcentajePapasConfigurado;factorCongestionConfigurado;tipo;cocineros;mediaTiempoPromedio;desvioTiempoPromedio;ic95InferiorTiempoPromedio;ic95SuperiorTiempoPromedio;mediaTiempoMaximo;mediaColaArmadoMaxima;mejoraMediaVsUno;mejoraPorcentualVsUno;ic95InferiorMejora;ic95SuperiorMejora;significativa
+30;36;120;210;2;3;1;4;0,35;0,75;1;resumen;1;76,9125;14,6089;71,8724;82,1842;144,2002;36,9333;0;0;0;0;base
+30;36;120;210;2;3;1;4;0,35;0,75;1;resumen;2;76,5528;14,6215;71,6488;81,8352;143,0801;36,9;0,3597;0,4676;0,2851;0,44;si_mejora
+30;36;120;210;2;3;1;4;0,35;0,75;1;resumen;3;76,4102;14,6063;71,4078;81,6502;142,738;37;0,5023;0,653;0,3936;0,6158;si_mejora

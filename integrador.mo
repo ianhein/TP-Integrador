@@ -1,4 +1,4 @@
-﻿model Simulacion
+model Simulacion
   constant Integer maxHamburguesasModelo = 12
     "Limite interno para permitir editar hamburguesasMax";
 
@@ -40,8 +40,14 @@
     "Tiempo informado por el local; cero desactiva la comparacion";
 
   // Capacidad simultanea de una tanda
-  parameter Integer capacidadHamburguesasTanda(min = 1) = 40;
-  parameter Integer capacidadPapasTanda(min = 1) = 40;
+  parameter Integer cantidadPlanchas(min = 1) = 2
+    "Cantidad de planchas disponibles";
+  parameter Integer capacidadHamburguesasPorPlancha(min = 1) = 20;
+  parameter Integer capacidadPapasPorPlancha(min = 1) = 20;
+  parameter Integer capacidadHamburguesasTanda(min = 1) =
+    cantidadPlanchas * capacidadHamburguesasPorPlancha;
+  parameter Integer capacidadPapasTanda(min = 1) =
+    cantidadPlanchas * capacidadPapasPorPlancha;
 
   // Tiempos de coccion
   parameter Real tMedallonMin = 7;
